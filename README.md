@@ -23,7 +23,7 @@ your build system). It should run in an emulated environment such as QEMU.
 :white_check_mark: Extend tests to cover high frequency messages (IPC usleep() should be fine tuned)</br>
 :white_check_mark: Monitor CPU usage</br>
 :white_check_mark: Switch to different storage method for faster and more compact storage</br>
-:white_check_mark: Add custom logger (maybe syslog)
+:white_check_mark: Add custom logger (maybe syslog)</br>
 :white_check_mark: Make main less of a mess
 
 ## Getting started
