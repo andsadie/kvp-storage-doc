@@ -3,7 +3,6 @@
 2. [Getting started](#getting-started)
 3. [Thought process](#thought-process)
 4. [Testing and Performance](#testing-and-performance)
-5. [Cleaning up](#cleaning-up)
 
 ## Objectives
 ### Application
@@ -16,7 +15,7 @@
 :heavy_check_mark: Your application must compile and run on desktop Linux</br>
 
 ### Build
-:white_check_mark: Your application must be added as a package to an embedded Linux build for any ARM architecture (so part of the rootfs produced by
+:heavy_check_mark: Your application must be added as a package to an embedded Linux build for any ARM architecture (so part of the rootfs produced by
 your build system). It should run in an emulated environment such as QEMU.
 
 ### To improve
@@ -25,6 +24,7 @@ your build system). It should run in an emulated environment such as QEMU.
 :white_check_mark: Monitor CPU usage</br>
 :white_check_mark: Switch to different storage method for faster and more compact storage</br>
 :white_check_mark: Add custom logger (maybe syslog)
+:white_check_mark: Make main less of a mess
 
 ## Getting started
 ### Running application on Linux
@@ -41,22 +41,32 @@ The binary will use STDIO by default but the interface method can also be specif
 ```
 KVPStorage -h
 ```
-Unless a directory is specified, KVPStorage will use the directory from where the binary is executed to store variables.
-Example of how to switch to IPC method and specify directories
+Unless otherwise specified, KVPStorage will create a folder `kvps_variables` in `/var/lib/` to store the key-value pairs. When the `ipc` method is used instead of `stdio`, KVPStorage will create a folder `fifos` in `/var/lib/`. This is mostly intended for the embedded system so I would recommend running KVPStorage with different parameters if running in your work environment.<br/>
+Example of how to run KVPStorage in the current directory for both input methods:
 ```
-KVPStorage -i ipc -d /var/lib/ -f /var/lib/
+KVPStorage -d .
+KVPStorage -i ipc -d . -f .
 ```
-I have also included a binary in the `ready_binary` folder.
-### Building Yocto image
-I configured Yocto a bit last second and I tried to simplify it as much as possible but that made a bit of a mess. Please let me know if there's any issues.
+### Buildroot
+I struggled to configure Yocto to use local files instead of a remote repo so I ended up switching to Buildroot. I suspect there might be a bug in the version of Yocto I used.<br/>
+For buildroot:
 ```
-cd yocto
-./build-image.sh
-./run-container.sh 
-./configure.sh
+git clone git://git.buildroot.net/buildroot
+cd buildroot/
+make qemu_arm_versatile_defconfig
 ```
-Note that this process may take a while.
-
+Then you should be able to copy the buildroot folder containing `package` over the buildroot you just created.
+From inside the `buildroot` dir run:
+```
+echo 'BR2_PACKAGE_KVPS=y' >> .config
+make
+```
+And then to run the image in qemu:
+```
+qemu-system-arm -M versatilepb -kernel output/images/zImage -dtb output/images/versatile-pb.dtb -drive file=output/images/rootfs.ext2,if=scsi -append "root=/dev/sda console=ttyAMA0,115200" -nographic
+```
+Note that I have named the binary `kvps` in the image instead of KVPStorage to match the style of other binaries.</br>
+I have also provided a built image in buildroot-image
 ## Thought process
 My initial thought is that existing environment variables are exactly for this purpose and would be an easy way to implement this functionality since most of the work is already done. setenv(), putenv() and unsetenv() would provide the 3 core functions. Depending on the number of variables that need to be stored, execve() could potentially be used to extend the default limit for environment variables.<br/>
 #### Pros:
@@ -87,9 +97,9 @@ JSON, XML or YAML.<br/>
 I am not too familiar with mmap() and decided not to investigate it due to time concerns but I'm making a note to read up on it.
 
 ## Implementation
-I decided to implement STORAGE OPTION 2 because I believe it would be a better option for a small set of key-value pairs. The ability to easily read values from any other application seems like a valuable advantage.
+I decided to implement the individual file key-value pair method because I believe it would be a better option for a reasonable set of key-value pairs. The ability to easily read values from any other application seems like a valuable advantage.
 
-Depending on the use case this option might not be compact and small enough. I would probably use JSON as my alternative. 
+Depending on the use case this option might not be compact or small enough. I would probably use JSON as my alternative. 
 
 ## Testing and Performance
 Tests performed on my PC
@@ -100,28 +110,3 @@ Tests performed on my PC
 I was expecting a more significant difference between 1000 and 100000 key-value pairs. However, I have observed that the read time for 100000 key-value pairs is significantly slower when the device is under high disk usage already. Around 10 times slower from my observations.
 Example of test output:</br>
 ![image](https://user-images.githubusercontent.com/17459470/162827555-83191618-2096-485f-bc1a-d3c818d1d33c.png)
-
-## Cleaning up
-All docker images can be listed with
-
-```
-docker image ls
-```
-
-Images can be removed by image name or ID
-
-```
-docker image rm yocto-image-name
-```
-
-The docker container is started with the `-rm` flag so it should automatically be removed when the container exits. Otherwise, you can list all containers with
-
-```
-docker container ls
-```
-
-And then remove the container by name or ID similar to how the image is removed
-
-```
-docker container rm yocto-container-name
-```
