@@ -54,8 +54,15 @@ For buildroot:
 git clone git://git.buildroot.net/buildroot
 cd buildroot/
 make qemu_arm_versatile_defconfig
+make menuconfig
 ```
-Then you should be able to copy the buildroot folder containing `package` over the buildroot you just created.
+Change the following
+```
+Tooolchain > C library > glibc
+Tooolchain > GCC compiler version gcc 11.x
+Tooolchain > Enable c++ support
+```
+Then you should be able to copy the package from the provided buildroot folder over to the packages from buildroot you just created.
 From inside the `buildroot` dir run:
 ```
 echo 'BR2_PACKAGE_KVPS=y' >> .config
