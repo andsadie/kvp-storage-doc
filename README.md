@@ -62,6 +62,12 @@ Tooolchain > C library > glibc
 Tooolchain > GCC compiler version gcc 11.x
 Tooolchain > Enable c++ support
 ```
+Also add the following to package/Config.in
+```
+menu "Misc"
+    source "package/kvps/Config.in"
+endmenu
+```
 Then you should be able to copy the package from the provided buildroot folder over to the packages from buildroot you just created.
 From inside the `buildroot` dir run:
 ```
