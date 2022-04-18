@@ -19,12 +19,12 @@
 your build system). It should run in an emulated environment such as QEMU.
 
 ### To improve
-:white_check_mark: Extend tests to cover more than just the core application, especially IpcIO and FileIO classes</br>
-:white_check_mark: Extend tests to cover high frequency messages (IPC usleep() should be fine tuned)</br>
-:white_check_mark: Monitor CPU usage</br>
-:white_check_mark: Switch to different storage method for faster and more compact storage</br>
-:white_check_mark: Add custom logger (maybe syslog)</br>
-:white_check_mark: Make main less of a mess
+:negative_squared_cross_mark: Extend tests to cover more than just the core application, especially IpcIO and FileIO classes</br>
+:negative_squared_cross_mark: Extend tests to cover high frequency messages (IPC usleep() should be fine tuned)</br>
+:negative_squared_cross_mark: Monitor CPU usage</br>
+:negative_squared_cross_mark: Switch to different storage method for faster and more compact storage</br>
+:negative_squared_cross_mark: Add custom logger (maybe syslog)</br>
+:negative_squared_cross_mark: Make main less of a mess
 
 ## Getting started
 ### Running application on Linux
