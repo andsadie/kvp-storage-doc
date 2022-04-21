@@ -58,9 +58,9 @@ make menuconfig
 ```
 Change the following
 ```
-Tooolchain > C library > glibc
-Tooolchain > GCC compiler version gcc 11.x
-Tooolchain > Enable c++ support
+Toolchain > C library > glibc
+Toolchain > GCC compiler version gcc 11.x
+Toolchain > Enable c++ support
 ```
 Also add the following to package/Config.in
 ```
